@@ -19,12 +19,13 @@ pipeline earns credit; *"80% seemed reasonable"* does not.
 
 ## 1. Retrieved chunks contain the answer
 
-For at least 4 of my 5 test questions, the retrieved chunks include one that
-contains the answer.
+For at least 4 of my 5 test questions, the retrieved chunks should include at least one chunk that contains the information needed to answer the question.
+
 
 **Why this target:**
-<!-- e.g. "One of my questions is about a topic only two documents mention, so
-     I expect that one to be hard." -->
+My campus_life corpus contains 88 short documents covering different student-life topics, including dining, housing, parking, and studying. I chose 4 out of 5 because most of my test questions should have relevant information in these documents, but some questions may be harder to answer if the information is limited or spread across documents.
+
+
 
 ---
 
@@ -33,8 +34,7 @@ contains the answer.
 Every answer the system produces names at least one source document.
 
 **Why this target:**
-<!-- Why all five and not four? What about your setup makes that achievable —
-     or what would have to go wrong for it not to be? -->
+I chose all 5 because every answer should include a source so students can verify the information. My system stores the original document filenames with the retrieved chunks, so including a source in every answer should be achievable. If an answer does not name a source, it could mean the source information was not passed correctly or the system failed to display it.
 
 ---
 
@@ -44,56 +44,28 @@ When I ask a question my documents clearly don't cover, the relevance gate
 stops it and the system returns "I don't have enough information about that" —
 in at least 4 of 5 tries.
 
-<!-- The five questions are the ones in `OUT_OF_SCOPE` at the bottom of
-     `questions.py`, and `run_eval.py` puts them through the gate and writes
-     what happened into your run log. Swap them for your own if you'd rather —
-     just keep five of them, or the "4 of 5" above has nothing to be 4 of. -->
-
 **Why this target:**
-<!-- What did your distances look like when you set the cutoff in Milestone 4?
-     Was there a clean gap, or did the two groups overlap? -->
+My corpus contains information about campus life, so the system should refuse questions about unrelated subjects instead of making up answers. I chose 4 out of 5 because the relevance gate relies on similarity distances, and sometimes an unrelated question might still match a campus document by accident.
 
 ---
 
 ## 4. Something about your chunks
-
-<!-- YOU WRITE THIS ONE.
-
-     How would you know if your chunks were the right size? Name something
-     countable or observable.
-
-     Examples of the right shape — don't copy these, they should come from
-     what you actually saw in Milestone 3:
-       - "At least 4 of 5 sampled chunks read as a complete thought, with no
-          sentence cut in half at either end."
-       - "No chunk is shorter than 200 characters, since anything below that
-          in my corpus turned out to be a heading with no content under it." -->
-
-
+At least 4 out of 5 chunks I look at should be easy to understand on their own and should not end in the middle of a sentence or idea.
 
 **Why this target:**
 
-
+Most documents in my campus_life corpus are short student-life posts, so I want each chunk to preserve enough context to understand what the document is discussing. I chose 4 out of 5 because nearly all sampled chunks should be readable without needing another chunk to understand them. A chunk that ends halfway through a sentence could cause the system to miss important information.
 
 ---
 
-## 5. Your choice
+## 5. The first retrieved result matches the question topic
 
-<!-- YOU WRITE THIS ONE TOO.
-
-     Pick something you actually care about getting right. It could be about
-     speed, about refusals, about a particular kind of question your corpus
-     handles badly, about source attribution being correct rather than merely
-     present — anything, as long as it names a number or an observable
-     outcome. -->
-
-
+For at least 4 of my 5 test questions, the first retrieved chunk should discuss the same campus-life topic as the question.
 
 **Why this target:**
 
+My test questions cover different campus-life topics, including dining, parking, studying in the library, and campus events. I want the highest-ranked result to match the question's topic instead of simply containing similar words. I chose 4 out of 5 because most questions should retrieve a relevant top result, although some topics may overlap.
 
-
----
 
 <!-- ─────────────────────────────────────────────────────────────────────────
      UNIT 2 — read this before you change anything above.
