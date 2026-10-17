@@ -1,19 +1,5 @@
 # The Unofficial Guide
-
-<!-- Replace this line with your name and which corpus you picked. -->
-
-> **This file is your submission.** Fill it in as you go — most sections get
-> written during the milestone that produces them, not at the end.
->
-> How the starter works, and every command you'll need, is in `RUNNING.md`.
-> Leave that file alone.
->
-> **Paste everything as text.** No screenshots, no video. A typed table gets
-> full credit; a picture of the same table gets none.
->
-> Delete these instruction blocks as you replace them. The `<!-- -->` comments
-> are notes to you and don't show up when the page renders — you can leave them
-> or remove them.
+Created by Reena Kumari using the campus_life corpus.
 
 ---
 
@@ -22,7 +8,7 @@
 ## What This Does
 
 I used the campus_life corpus, which contains student posts about college life. My system lets people ask questions about things like housing, dining halls, classes, parking, and campus events. It searches the documents for relevant information and uses Gemini to give an answer with the source it came from.
-     Milestone 5. -->
+
 
 ## Chunking Strategy
 
@@ -50,14 +36,16 @@ After making the change, I ran the indexing command again. It created 88 chunks 
 
 **Chunk 1** — source: `admin_add_drop_deadline.txt#0` — produced by: `chunker.py::split_documents`
 
-```On the add/drop deadline
+```
+On the add/drop deadline
 
 You can add a course through the end of the second week. Dropping is a longer window — through the end of week six — but a drop after week two shows as a W on your transcript. Nothing anywhere on the registrar's site says this plainly, and students find out from each other.
 ```
 
 **Chunk 2** — source: `course_biol_160.txt#0 ` — produced by: `chunker.py::split_documents`
 
-```BIOL 160 Cell Biology
+```
+BIOL 160 Cell Biology
 
 I lived here my sophomore year. Format is lecture three times a week with a weekly lab. Assessment: four unit tests and a cumulative final. Not curved.
 
@@ -68,7 +56,8 @@ The one piece of advice: the unit tests come fast, roughly every three weeks; fa
 
 **Chunk 3** — source: `course_hist_118_workload.txt#0 ` — produced by: `chunker.py::split_documents`
 
-```Workload for HIST 118 Modern World History
+```
+Workload for HIST 118 Modern World History
 
 People keep asking so: a lot of reading, about 120 pages a week, but no problem sets. That's real time, not optimistic time.
 
@@ -77,7 +66,8 @@ It's front-loaded — the first month is heavier than the rest, partly because y
 
 **Chunk 4** — source: `dining_pellew_dining_hall_followup.txt#0` — produced by: `chunker.py::split_documents`
 
-```Re: Pellew Dining Hall
+```
+Re: Pellew Dining Hall
 
 Adding to what people have said about Pellew Dining Hall. The wait figure of 12 to 18 minutes at peak matches what I've seen. If you're trying to eat between classes, go before 11:45 and it's a different building entirely.
 
@@ -87,7 +77,8 @@ Also worth saying: the furthest hall from anywhere, next to the athletics centre
 
 **Chunk 5** — source: `housing_innisfree_hall.txt#0` — produced by: `chunker.py::split_documents`
 
-```Innisfree Hall — what it's actually like
+```
+Innisfree Hall — what it's actually like
 
 Transferred in last year, so take this with a grain of salt. Built 1991, renovated 2022. Rooms are doubles arranged as pairs sharing one bathroom between two rooms.
 
@@ -107,7 +98,8 @@ Laundry costs $1.75 wash, $1.75 dry, app-based. On noise: moderate; the building
 
 **Answer:**
 
-```The housing lottery is not entirely random in the way most people assume. While rising sophomores get a number drawn at random, juniors and seniors are ordered by accumulated credit hours first, and only use random tie-breaks.
+```
+The housing lottery is not entirely random in the way most people assume. While rising sophomores get a number drawn at random, juniors and seniors are ordered by accumulated credit hours first, and only use random tie-breaks.
 
 (Source: admin_housing_lottery.txt)
 
@@ -117,19 +109,9 @@ Sources retrieved: admin_housing_lottery.txt, admin_parking_permits.txt, advisin
 
 **My relevance cutoff:** 0.6 
 
-The housing lottery is not entirely random in the way most people assume. While rising sophomores get a number drawn at random, juniors and seniors are ordered by accumulated credit hours first, and only use random tie-breaks.
-
-(Source: admin_housing_lottery.txt)
-
-Sources retrieved: admin_housing_lottery.txt, admin_parking_permits.txt, advising_registration.txt, housing_morrow_house.txt, housing_tamsin_court.txt
-
-My relevance cutoff: 0.6
-
 For the housing lottery question, the best distance was 0.254. Since this is below my cutoff of 0.6, the system answered the question.
-
-I will compare the distances from five questions my documents cover and five questions they do not cover to check whether this cutoff is appropriate.
     
-     Milestone 4. -->
+
 
 
 | Question | In corpus? | Best distance |
