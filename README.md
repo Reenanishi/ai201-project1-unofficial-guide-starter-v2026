@@ -21,26 +21,21 @@
 
 ## What This Does
 
-<!-- Three or four sentences. Which corpus you picked, and the kinds of
-     questions your system answers. Write it for someone who has never seen
-     this repo.
-
+I used the campus_life corpus, which contains student posts about college life. My system lets people ask questions about things like housing, dining halls, classes, parking, and campus events. It searches the documents for relevant information and uses Gemini to give an answer with the source it came from.
      Milestone 5. -->
 
 ## Chunking Strategy
 
-**Chunk size:**
-**Overlap:**
+**Chunk size:**One complete document per chunk (variable length; approximately 317 characters on average)
 
-<!-- What about YOUR documents made you pick these numbers? Short posts and
-     long sectioned guides don't want the same chunking, and "800 seemed
-     reasonable" earns nothing. Point at something you noticed when you read
-     the documents in Milestone 1.
 
-     If you changed your mind partway through, say so and say why. That's worth
-     more than pretending you got it right first time.
+**Overlap:** 0 characters
 
-     Milestone 3. -->
+I chose this strategy because my campus_life documents are short student posts. When I first ran the starter code, it loaded 88 documents and created 88 chunks using an 800-character chunk size and 120-character overlap. Most posts were already shorter than 800 characters, so the starter wasn't actually splitting them.
+
+I decided to keep each post as one chunk because the title and details belong together. For example, a housing post might describe the rooms, laundry, and noise in the same document. Splitting that post could remove useful context. I changed the split_documents function in chunker.py to keep each complete post together without overlap.
+
+After making the change, I ran the indexing command again. It created 88 chunks from 88 documents, with an average length of 317 characters. The shortest chunk was 178 characters and the longest was 549 characters.
 
 ## Sample Chunks
 
@@ -53,29 +48,54 @@
 
      Milestone 3. -->
 
-**Chunk 1** — source: `` — produced by: ``
+**Chunk 1** — source: `admin_add_drop_deadline.txt#0` — produced by: `chunker.py::split_documents`
 
-```
-```
+```On the add/drop deadline
 
-**Chunk 2** — source: `` — produced by: ``
-
-```
+You can add a course through the end of the second week. Dropping is a longer window — through the end of week six — but a drop after week two shows as a W on your transcript. Nothing anywhere on the registrar's site says this plainly, and students find out from each other.
 ```
 
-**Chunk 3** — source: `` — produced by: ``
+**Chunk 2** — source: `course_biol_160.txt#0 ` — produced by: `chunker.py::split_documents`
+
+```BIOL 160 Cell Biology
+
+I lived here my sophomore year. Format is lecture three times a week with a weekly lab. Assessment: four unit tests and a cumulative final. Not curved.
+
+Expect 9 to 11 hours a week, the heaviest first-year course by reputation.
+
+The one piece of advice: the unit tests come fast, roughly every three weeks; falling behind once is very hard to recover from.
+```
+
+**Chunk 3** — source: `course_hist_118_workload.txt#0 ` — produced by: `chunker.py::split_documents`
+
+```Workload for HIST 118 Modern World History
+
+People keep asking so: a lot of reading, about 120 pages a week, but no problem sets. That's real time, not optimistic time.
+
+It's front-loaded — the first month is heavier than the rest, partly because you're learning the format.
+```
+
+**Chunk 4** — source: `dining_pellew_dining_hall_followup.txt#0` — produced by: `chunker.py::split_documents`
+
+```Re: Pellew Dining Hall
+
+Adding to what people have said about Pellew Dining Hall. The wait figure of 12 to 18 minutes at peak matches what I've seen. If you're trying to eat between classes, go before 11:45 and it's a different building entirely.
+
+Also worth saying: the furthest hall from anywhere, next to the athletics centre. Nobody tells you this at orientation.
 
 ```
-```
 
-**Chunk 4** — source: `` — produced by: ``
+**Chunk 5** — source: `housing_innisfree_hall.txt#0` — produced by: `chunker.py::split_documents`
 
-```
-```
+```Innisfree Hall — what it's actually like
 
-**Chunk 5** — source: `` — produced by: ``
+Transferred in last year, so take this with a grain of salt. Built 1991, renovated 2022. Rooms are doubles arranged as pairs sharing one bathroom between two rooms.
 
-```
+The good: the shared-bathroom-between-two-rooms arrangement is the best compromise on campus.
+
+The bad: no air conditioning, which matters for the first three weeks of September.
+
+Laundry costs $1.75 wash, $1.75 dry, app-based. On noise: moderate; the building is L-shaped and the short wing is much quieter.
 ```
 
 ## Sample Answer
@@ -83,27 +103,51 @@
 <!-- One complete question and answer, pasted as text, with the source line
      visible. Milestone 4. -->
 
-**Question:**
+**Question:** Is the housing lottery random?
 
 **Answer:**
 
+```The housing lottery is not entirely random in the way most people assume. While rising sophomores get a number drawn at random, juniors and seniors are ordered by accumulated credit hours first, and only use random tie-breaks.
+
+(Source: admin_housing_lottery.txt)
+
+Sources retrieved: admin_housing_lottery.txt, admin_parking_permits.txt, advising_registration.txt, housing_morrow_house.txt, housing_tamsin_court.txt
+
 ```
-```
 
-**My relevance cutoff:**
+**My relevance cutoff:** 0.6 
 
-<!-- The number you set in config.py, and how you got there.
+The housing lottery is not entirely random in the way most people assume. While rising sophomores get a number drawn at random, juniors and seniors are ordered by accumulated credit hours first, and only use random tie-breaks.
 
-     You ran five questions your corpus covers and the five in OUT_OF_SCOPE
-     that it clearly doesn't, and wrote down the best distance for each. What
-     did those two groups look like? Where was the gap? Put the actual numbers
-     here — the table below wants all ten rows.
+(Source: admin_housing_lottery.txt)
 
+Sources retrieved: admin_housing_lottery.txt, admin_parking_permits.txt, advising_registration.txt, housing_morrow_house.txt, housing_tamsin_court.txt
+
+My relevance cutoff: 0.6
+
+For the housing lottery question, the best distance was 0.254. Since this is below my cutoff of 0.6, the system answered the question.
+
+I will compare the distances from five questions my documents cover and five questions they do not cover to check whether this cutoff is appropriate.
+    
      Milestone 4. -->
+
 
 | Question | In corpus? | Best distance |
 |---|---|---|
-|  |  |  |
+| Is the housing lottery random? | Yes | 0.254 |
+| What do students say about wait times at Commons during lunch? | Yes | 0.308 |
+| What do students say about the food options at campus dining halls? | Yes | 0.486 |
+| What do students say about finding parking on campus? | Yes | 0.584 |
+| What do students say about studying in the library? | Yes | 0.528 |
+| What is the capital of France? | No | 0.859 |
+| How do I bake a chocolate cake? | No | 0.844 |
+| Who won the 2022 FIFA World Cup? | No | 0.853 |
+| How far is Earth from the Sun? | No | 0.766 |
+| Who painted the Mona Lisa? | No | 0.779 |
+
+I tested five questions that my campus_life documents cover and five unrelated questions. The highest distance for an in-corpus question was 0.584, and the lowest distance for an out-of-scope question was 0.766.
+
+I decided to keep my relevance cutoff at 0.6 because all five campus questions had distances below it and received answers with sources. All five unrelated questions had distances above 0.6, so the system correctly refused to answer them. This cutoff worked for all 10 questions I tested.
 
 ## How I Used AI
 
@@ -117,8 +161,14 @@
      Milestone 5. -->
 
 **1.**
+Fixing the gemini API key error
+
+When I first ran my project, I got an error because my Gemini API key was invalid. I asked ChatGPT what was causing the error and how to fix it. It explained that I needed to generate a new API key and update my .env file. I replaced the key and ran python test.py again. After that, all 10 tests passed.
 
 **2.**
+Improving my chunking strategy
+
+I asked ChatGPT and claude how I could improve the chunking function for my campus_life documents. It suggested keeping each short document as one chunk instead of splitting it into fixed-size pieces. I updated the split_documents function in chunker.py and tested it. At first, the output still showed fallback_split, so I saved my changes and ran the command again. The new output showed split_documents, which confirmed that my updated function was working.
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
