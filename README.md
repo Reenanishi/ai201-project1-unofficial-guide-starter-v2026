@@ -113,7 +113,6 @@ For the housing lottery question, the best distance was 0.254. Since this is bel
     
 
 
-
 | Question | In corpus? | Best distance |
 |---|---|---|
 | Is the housing lottery random? | Yes | 0.254 |
@@ -179,15 +178,96 @@ I asked ChatGPT and claude how I could improve the chunking function for my camp
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunk contains the answer | 4 of 5 | 4/5 | 4/5 |4/5 | MET |
+| 2. Every answer names a source | 5 of 5 | 4/5 |4/5  | 4/5 | MISSED |
+| 3. Gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5  | 5/5 |MET |
+| 4. Chunks are readable and complete | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 5. First retrieved chunk matches the question topic| 4 of 5 |  1/5 | 1/5 |  1/5 | MISSED |
 
-<!-- Underneath, paste the REAL output for each criterion from one of your
-     runs — the actual text your system produced, not a description of it.
-     Name the file and function that produced it. -->
+### Criterion 1 — Retrieved chunks contain the answer
+
+Source file: `results/run_2026-10-17_0139_before.md`
+Evaluation function: `run_eval.py`
+
+Question: What do students say about wait times at Commons during lunch?
+
+Best distance: 0.3080 (passed the gate)
+
+Sources retrieved: dining_halden_hall_followup.txt, dining_kestrel_commons.txt, dining_kestrel_commons_followup.txt, dining_north_kitchen_followup.txt, dining_the_ridgeway_cafe_followup.txt
+
+Actual answer:
+Students say that the wait times at Kestrel Commons are 20 to 25 minutes between 12:15 and 1:00, and under 5 minutes before 11:45.
+
+Source: dining_kestrel_commons.txt (and dining_kestrel_commons_followup.txt)
+
+### Criterion 2 — Every answer names a source
+
+Source file: `results/run_2026-10-17_0139_before.md`
+Evaluation script: `run_eval.py`
+
+Question: What do students say about campus events? — run 1
+
+Best distance: 0.6348 (refused by the gate)
+
+Sources retrieved: course_econ_101.txt, course_hist_118.txt, dining_verrill_street_grill.txt, housing_tamsin_court.txt, orientation_what_matters.txt
+
+Actual answer:
+I don't have enough information about that.
+
+Result: 4 of 5 answers named a source. The campus events answer did not name one, so Criterion 2 was MISSED.
+
+### Criterion 3 — Gate stops out-of-corpus questions
+
+Source file: `results/run_2026-10-17_0139_before.md`
+Evaluation function: `run_eval.py::check_out_of_scope`
+
+Gate cutoff: 0.6
+
+Actual output:
+
+| Out-of-scope question | Best distance | Gate |
+|---|---|---|
+| What is the capital of Mongolia? | 0.825 | refused |
+| How do I change the oil in a diesel engine? | 0.934 | refused |
+| Who won the 1994 World Cup? | 0.886 | refused |
+| What is the recommended dosage of ibuprofen for a headache? | 0.844 | refused |
+| How do I write a for loop in Rust? | 0.896 | refused |
+
+Result: The gate refused 5 of 5 out-of-corpus questions. Criterion 3 was MET.
+
+### Criterion 4 — Chunks are readable and complete
+
+Source file: `chunker.py`
+Function: `chunker.py::split_documents`
+Command: `python3 chunker.py`
+
+Actual terminal output:
+```text
+88 chunks, 317 characters on average (shortest 178, longest 549), produced by chunker.py::split_documents
+```
+
+The split_documents function keeps each short document as one complete chunk instead of cutting it in the middle.
+
+Result: 5 of 5 inspected chunks were readable and complete. Criterion 4 was MET.
+
+### Criterion 5 — First retrieved chunk matches the question topic
+
+Source file: `results/run_2026-10-17_0139_before.md`
+Evaluation script: `run_eval.py`
+
+Question: What do students say about wait times at Commons during lunch?
+
+Best distance: 0.3080 (passed the gate)
+
+Sources retrieved:
+dining_halden_hall_followup.txt, dining_kestrel_commons.txt, dining_kestrel_commons_followup.txt, dining_north_kitchen_followup.txt, dining_the_ridgeway_cafe_followup.txt
+
+First retrieved chunk: dining_halden_hall_followup.txt
+
+Expected topic: Kestrel Commons lunch wait times.
+
+Result: The first retrieved chunk was about Halden Hall instead of Kestrel Commons. Only 1 of 5 questions had a first chunk matching the specific question topic, so Criterion 5 was MISSED.
+
 
 ## Verdicts
 
@@ -202,11 +282,11 @@ I asked ChatGPT and claude how I could improve the chunking function for my camp
 
 | # | Criterion | Verdict | How I decided |
 |---|---|---|---|
-| 1 |  |  |  |
-| 2 |  |  |  |
-| 3 |  |  |  |
-| 4 |  |  |  |
-| 5 |  |  |  |
+| 1 | Retrieved chunk contains the answer | MET | All three runs scored 4/5, meeting the target of 4/5. |
+| 2 | Every answer names a source | MISSED | All three runs scored 4/5, below the target of 5/5. The campus events answer was a refusal without a source. |
+| 3 | Gate stops out-of-corpus questions | MET | The gate refused all 5 out-of-corpus questions, exceeding the target of 4/5. |
+| 4 | Chunks are readable and complete | MET | All 5 inspected chunks were readable and complete, exceeding the target of 4/5. |
+| 5 | First retrieved chunk matches the question topic | MISSED | Only 1/5 first chunks matched the specific question topic in each run, below the target of 4/5. |
 
 ## Diagnoses
 
@@ -227,6 +307,26 @@ I asked ChatGPT and claude how I could improve the chunking function for my camp
      low, and which one you'd tighten and to what.
 
      Milestone 3. -->
+
+     ### Criterion 2 — Every answer names a source (MISSED)
+
+Pipeline stage: Retrieval and generation.
+
+The campus events question retrieved unrelated documents, including course_econ_101.txt. Its best distance was 0.6348, above the gate cutoff of 0.6.
+
+Because the gate rejected the question, the system generated "I don't have enough information about that." without naming a source.
+
+This caused Criterion 2 to score 4/5 instead of the required 5/5.
+
+### Criterion 5 — First retrieved chunk matches the question topic (MISSED)
+
+Pipeline stage: Retrieval.
+
+For the question about Kestrel Commons lunch wait times, the first retrieved document was dining_halden_hall_followup.txt instead of dining_kestrel_commons.txt.
+
+The correct information was retrieved, but it appeared lower in the results. This shows that the retrieval system did not consistently rank the most topic-specific document first.
+
+Only 1 of 5 questions had a first retrieved chunk matching the specific question topic.
 
 ## The Improvement
 
