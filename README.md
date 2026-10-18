@@ -151,6 +151,13 @@ Improving my chunking strategy
 
 I asked ChatGPT and claude how I could improve the chunking function for my campus_life documents. It suggested keeping each short document as one chunk instead of splitting it into fixed-size pieces. I updated the split_documents function in chunker.py and tested it. At first, the output still showed fallback_split, so I saved my changes and ran the command again. The new output showed split_documents, which confirmed that my updated function was working.
 
+**3.**
+Testing and improving retrieval in Unit 2**
+
+I asked ChatGPT to help me understand my evaluation results and identify why Criterion 5 was missed. It suggested changing the `search` function in `store.py` to rank documents using words from their filenames. I added the code and ran the after-test using `python3 run_eval.py --label after`. The results showed that Criterion 5 was still 1/5, so the change did not solve the problem. I used ChatGPT to help compare the before-and-after results, but I kept the actual scores and reported that the improvement did not work.
+
+
+
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
      claims earns nothing.
@@ -331,8 +338,10 @@ Only 1 of 5 questions had a first retrieved chunk matching the specific question
 ## The Improvement
 
 **What I changed:**
+I updated the `search` function in `store.py` to improve the order of retrieved documents. The change checks whether words from the student's question appear in the retrieved document's filename. Documents with more matching words are moved higher in the results. If documents have the same number of matches, the original distance score is used to decide their order.
 
 **Why I picked it:**
+I chose this improvement because Criterion 5 was MISSED in my before-test. Only 1 of 5 questions had a first retrieved chunk that matched the specific question topic. For example, the Commons lunch question retrieved a Halden Hall document first instead of a Kestrel Commons document. I wanted to improve retrieval ranking so that documents matching the question topic would appear first.
 
 <!-- Connect it to a specific diagnosis above in one sentence. If you can't,
      you picked a fix because it sounded impressive. -->
@@ -344,34 +353,31 @@ Only 1 of 5 questions had a first retrieved chunk matching the specific question
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunk contains the answer | 4 of 5 | 4/5 | 4/5 | 4/5 | MET |
+| 2. Every answer names a source | 5 of 5 | 4/5 | 4/5 | 4/5 | MISSED |
+| 3. Gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 4. Chunks are readable and complete | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 5. First retrieved chunk matches the question topic | 4 of 5 | 1/5 | 1/5 | 1/5 | MISSED |
 
 **Did it help?**
 
-<!-- Say plainly whether it did, and how you know. If it made things worse,
-     say that — a change that backfired, honestly reported, earns full credit
-     and is more interesting than one that worked. What matters is that you can
-     tell.
+The improvement did not improve my test results. Before the change, Criterion 5 scored 1/5 in all three runs. After the change, it still scored 1/5 in all three runs, so it remained MISSED. For example, the Commons lunch question still retrieved `dining_halden_hall_followup.txt` first instead of a Kestrel Commons document. The other four criteria also stayed the same. This shows that my filename-based ranking change was not enough to fix the retrieval problem.
 
-     Milestone 4. -->
 
 ## What's Still Broken
 
-<!-- For each criterion still missed after your fix: what you'd do about it,
-     and why you stopped where you did.
+Two criteria are still MISSED after my improvement.
 
-     "I ran out of time" is fine if it's true. Pretending nothing is left is
-     not.
+**Criterion 2 — Every answer names a source:** The campus events question still fails because the retrieved documents are not relevant enough. The best distance is above the 0.6 cutoff, so the gate refuses to answer without naming a source. To improve this, I would investigate whether the corpus contains useful campus events information and test a better retrieval method.
 
-     Milestone 5. -->
+**Criterion 5 — First retrieved chunk matches the question topic:** Only 1 of 5 questions retrieved the most relevant topic first. My filename-based ranking change did not improve this score. To fix it, I would try a more reliable reranking method that compares the question with the actual document content, not just the filename.
+
+I stopped after testing one improvement so I could compare the before-and-after results and document what still needs work.
 
 ## What I'd Do Differently
 
-<!-- Knowing what you know now — which of your five criteria would you write
-     differently, and why?
+If I could rewrite one of my five criteria, I would change Criterion 5. My original target was for the first retrieved chunk to match the question topic in 4 out of 5 questions. I learned that checking only the first result is a strict way to measure retrieval quality because the correct document can appear second or third and still help the system answer correctly.
 
-     Milestone 5. -->
+I would change this criterion to: "At least one of the top three retrieved chunks matches the specific question topic for 4 out of 5 questions." This would still measure retrieval relevance while recognizing that the system uses multiple retrieved chunks to generate an answer.
+
+I would keep my original Criterion 5 target when reporting my Unit 2 test results, because changing the target after testing would make the before-and-after comparison unfair.

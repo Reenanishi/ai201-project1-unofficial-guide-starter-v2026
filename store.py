@@ -1,3 +1,4 @@
+
 """
 Stages 3 and 4 of the pipeline: embedding chunks and retrieving them.
 
@@ -187,7 +188,8 @@ def search(
     """
     Retrieve the chunks closest in meaning to a question.
 
-    Returns them nearest-first, each with its distance.
+    Uses Chroma similarity search, then prioritizes filenames that
+    contain words from the question.
     """
     top_k = top_k or config.TOP_K
     name = config.collection_name(corpus, variant)
@@ -217,6 +219,17 @@ def search(
                 produced_by=str(meta.get("produced_by", "unknown")),
             )
         )
+
+    # UNIT 2 IMPROVEMENT:
+    # Prefer retrieved documents whose filenames match words in the question.
+    question_words = set(question.lower().split())
+
+    def topic_score(result):
+        filename = result.source.lower().replace("_", " ").replace(".txt", "")
+        return sum(word in filename.split() for word in question_words)
+
+    results.sort(key=lambda result: (-topic_score(result), result.distance))
+
     return results
 
 
